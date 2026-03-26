@@ -1,0 +1,51 @@
+Implement the numbering stage as the first real LLM-backed execution stage.
+
+Context:
+- init is already operational and creates the workspace correctly
+- numbering already compiles the final prompt correctly using context-builder.ts
+- now numbering must execute the model, persist the numbered stored procedure,
+  and update pipeline state
+
+Goal:
+Turn numbering into an executable stage that produces:
+work/<spId>/10-prepared/sp-numbered.sql
+
+Requirements:
+
+1. Refactor the numbering stage so it:
+   - builds the prompt using context-builder.ts
+   - invokes a model adapter
+   - receives raw model output
+   - normalizes the output
+   - validates the numbered procedure
+   - saves the result to:
+     work/<spId>/10-prepared/sp-numbered.sql
+   - updates meta/manifest.json to mark numbering as completed
+
+2. Create a minimal model adapter abstraction, for example:
+   invokeModel(stage, prompt): Promise<string>
+
+3. For now, the model adapter may contain a placeholder implementation or TODO,
+   but the architecture must be ready for real model invocation
+
+4. Add a minimal output normalization step:
+   - remove markdown fences if present
+   - remove obvious leading explanatory text if present
+
+5. Add a minimal validation step:
+   - output must not be empty
+   - output must contain numbered lines
+   - throw explicit error if validation fails
+
+6. Keep the implementation deterministic and fail-fast
+
+7. Do NOT implement all stages yet
+8. Implement only numbering as the first real execution stage
+
+9. If useful, introduce helper modules such as:
+   - src/core/model-adapter.ts
+   - src/core/output-normalizer.ts
+   - src/core/output-validator.ts
+
+Goal:
+Make numbering the first end-to-end executable stage of the migration pipeline.
